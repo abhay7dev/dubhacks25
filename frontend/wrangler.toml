@@ -1,0 +1,10 @@
+name = "resumax"
+type = "javascript"
+account_id = "3ee4aa23d77824b28aac0fbd2f6f7c94"
+workers_dev = true
+route = ""
+zone_id = ""
+
+[build]
+command = "npm run build"
+upload = { dir = "./dist" }
