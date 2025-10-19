@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Chatbot Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .response { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; white-space: pre-wrap; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Chatbot Connection</h1>
+    
+    <div class="test-section">
+        <h2>Test Different Endpoints</h2>
+        <p>Let's test which endpoint works:</p>
+        
+        <button onclick="testEndpoint('/chat')">Test /chat</button>
+        <button onclick="testEndpoint('/')">Test / (root)</button>
+        <button onclick="testEndpoint('')">Test no path</button>
+        
+        <div id="testResults" class="response" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test CORS</h2>
+        <button onclick="testCORS()">Test CORS Preflight</button>
+        <div id="corsResults" class="response" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Simple Request</h2>
+        <button onclick="testSimpleRequest()">Test Simple POST</button>
+        <div id="simpleResults" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'https://ar9tl5coac.execute-api.us-east-1.amazonaws.com';
+        
+        async function testEndpoint(path) {
+            const url = baseUrl + path;
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'response';
+            resultsDiv.textContent = `Testing: ${url}\n\nSending request...`;
+            
+            try {
+                console.log(`Testing endpoint: ${url}`);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: 'test_user_123',
+                        message: 'Hello'
+                    })
+                });
+                
+                console.log(`Response status: ${response.status}`);
+                console.log(`Response headers:`, Object.fromEntries(response.headers.entries()));
+                
+                const result = await response.text();
+                console.log(`Response body: ${result}`);
+                
+                if (response.ok) {
+                    resultsDiv.className = 'response success';
+                    resultsDiv.textContent = `✅ SUCCESS!\n\nURL: ${url}\nStatus: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\nBody: ${result}`;
+                } else {
+                    resultsDiv.className = 'response error';
+                    resultsDiv.textContent = `❌ FAILED!\n\nURL: ${url}\nStatus: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\nBody: ${result}`;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.className = 'response error';
+                resultsDiv.textContent = `❌ ERROR!\n\nURL: ${url}\nError: ${error.message}\n\nThis usually means:\n1. CORS not configured\n2. Endpoint doesn't exist\n3. Network connectivity issue`;
+            }
+        }
+        
+        async function testCORS() {
+            const resultsDiv = document.getElementById('corsResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'response';
+            resultsDiv.textContent = 'Testing CORS...';
+            
+            try {
+                const response = await fetch(baseUrl + '/chat', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                console.log('CORS Response:', response.status, Object.fromEntries(response.headers.entries()));
+                
+                if (response.status === 200) {
+                    resultsDiv.className = 'response success';
+                    resultsDiv.textContent = `✅ CORS WORKS!\n\nStatus: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}`;
+                } else {
+                    resultsDiv.className = 'response error';
+                    resultsDiv.textContent = `❌ CORS ISSUE!\n\nStatus: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}`;
+                }
+                
+            } catch (error) {
+                resultsDiv.className = 'response error';
+                resultsDiv.textContent = `❌ CORS ERROR!\n\nError: ${error.message}`;
+            }
+        }
+        
+        async function testSimpleRequest() {
+            const resultsDiv = document.getElementById('simpleResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.className = 'response';
+            resultsDiv.textContent = 'Testing simple request...';
+            
+            try {
+                // Test with minimal data
+                const response = await fetch(baseUrl + '/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: 'test',
+                        message: 'test'
+                    })
+                });
+                
+                const result = await response.text();
+                
+                resultsDiv.className = 'response success';
+                resultsDiv.textContent = `✅ REQUEST SENT!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                
+            } catch (error) {
+                resultsDiv.className = 'response error';
+                resultsDiv.textContent = `❌ REQUEST FAILED!\n\nError: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
