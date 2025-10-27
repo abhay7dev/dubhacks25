@@ -6,7 +6,7 @@
 We've seen so many Resume review tools online, but we find them super helpful for improving and tailoring our Resume for job applications, and ultimately, career growth. However, as students, we still find that we are overwhelmed when trying to grow our career because there is so much we need to do. We want to understand not just how to improve our resume, but also how to improve ourselves so we can target specific goals (such as a company, career, or title).
 
 ### What it does
-Our project ResuMAX gives students a clear plan to not just improve their resumes, but improves themselves as applicants. It uses specific information such as school, major, career goals, etc. to recommend courses to take, student organizations to join, etc. to help students take precise actions and achieve their dreams.
+Our project ResuMAX gives students a clear plan to not just improve their resumes, but improve themselves as applicants. It uses specific information such as school, major, career goals, etc. to recommend courses to take, student organizations to join, etc. to help students take precise actions and achieve their dreams.
 
 ### How we built it
 We utilized AWS services, cloudflare, NVIDIA GPUs, vscode, and AI tools to build a fully integrated infrastructure connecting different services to one another.
